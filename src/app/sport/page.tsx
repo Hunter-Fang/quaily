@@ -1,7 +1,8 @@
 import { getSportStats, getSportRecords, ACTIVITY_EMOJI, DEVICE_LABELS } from "@/lib/sport";
 import Link from "next/link";
 
-export const revalidate = 30;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export const metadata = {
   title: "运动数据 | 椒盐不谈",
