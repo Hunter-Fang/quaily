@@ -37,6 +37,7 @@ export default function MobileNav() {
             <Link href="/categories" className="text-sm font-medium py-2.5 hover:opacity-70 transition-opacity" style={{ color: "var(--c-text-3)" }}>分类</Link>
             <Link href="/tags" className="text-sm font-medium py-2.5 hover:opacity-70 transition-opacity" style={{ color: "var(--c-text-3)" }}>标签</Link>
             <Link href="/posts/about" className="text-sm font-medium py-2.5 hover:opacity-70 transition-opacity" style={{ color: "var(--c-text-3)" }}>关于</Link>
+            <Link href="/sport" className="text-sm font-medium py-2.5 hover:opacity-70 transition-opacity" style={{ color: "var(--c-text-3)" }}>运动</Link>
           </nav>
         </div>
       )}

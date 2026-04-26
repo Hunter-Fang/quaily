@@ -84,6 +84,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 <Link href="/categories" className="nav-link text-sm font-medium" style={{ color: "var(--c-text-3)" }}>分类</Link>
                 <Link href="/tags" className="nav-link text-sm font-medium" style={{ color: "var(--c-text-3)" }}>标签</Link>
                 <Link href="/posts/about" className="nav-link text-sm font-medium" style={{ color: "var(--c-text-3)" }}>关于</Link>
+                <Link href="/sport" className="nav-link text-sm font-medium" style={{ color: "var(--c-text-3)" }}>运动</Link>
               </div>
               <ThemeToggle />
               <MobileNav />
