@@ -4,21 +4,12 @@ import PostCard from "@/components/PostCard";
 import type { Metadata } from "next";
 
 export const revalidate = 10;
-
-type PageProps = {
-  params: Promise<{ tag: string }>;
-};
+type PageProps = { params: Promise<{ tag: string }> };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { tag } = await params;
   const decoded = decodeURIComponent(tag);
-  return {
-    title: `#${decoded} - 标签`,
-    description: `浏览椒盐不谈博客带有「#${decoded}」标签的所有文章，发现更多相关内容。`,
-    alternates: {
-      canonical: `/tags/${tag}`,
-    },
-  };
+  return { title: `#${decoded} - 标签`, description: `浏览带有「#${decoded}」标签的所有文章`, alternates: { canonical: `/tags/${tag}` } };
 }
 
 export async function generateStaticParams() {
@@ -33,50 +24,23 @@ export default async function TagPage({ params }: PageProps) {
 
   return (
     <div className="animate-fade-in-up">
-      <header className="mb-12">
-        <Link
-          href="/tags"
-          className="inline-flex items-center gap-1.5 text-stone hover:text-brand text-sm mb-6 transition-colors duration-200 group"
-        >
-          <svg
-            className="w-4 h-4 transition-transform group-hover:-translate-x-1"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-          所有标签
-        </Link>
+      <Link href="/tags" className="inline-flex items-center gap-1.5 text-sm mb-6 hover:opacity-70 transition-opacity" style={{ color: "var(--c-text-4)" }}>
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+        所有标签
+      </Link>
+      <div className="kami-section-header">
+        <div className="eyebrow"><span />Tag</div>
+        <h1>#{decoded}</h1>
+        <p className="mt-2 text-sm" style={{ color: "var(--c-text-3)" }}>共 {posts.length} 篇文章</p>
+        <div className="rule" />
+      </div>
 
-        <div className="flex items-center gap-2 mb-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-brand flex-shrink-0" />
-          <span className="text-stone text-xs font-medium tracking-[0.15em] uppercase">
-            Tag
-          </span>
-        </div>
-        <h1 className="font-serif text-3xl font-[500] text-near-black mb-2">
-          #{decoded}
-        </h1>
-        <p className="text-olive text-sm">共 {posts.length} 篇文章</p>
-        <div className="h-px bg-border-warm mt-6" />
-      </header>
-
-      <div className="stagger-children space-y-5">
-        {posts.map((post) => (
-          <PostCard key={post.id} post={post} />
-        ))}
+      <div className="stagger-children grid grid-cols-1 sm:grid-cols-2 gap-5">
+        {posts.map((post) => <PostCard key={post.id} post={post} />)}
       </div>
 
       {posts.length === 0 && (
-        <p className="text-center text-olive py-24 font-serif">
-          该标签下暂无文章
-        </p>
+        <p className="text-center py-24 font-serif" style={{ color: "var(--c-text-3)" }}>该标签下暂无文章</p>
       )}
     </div>
   );
