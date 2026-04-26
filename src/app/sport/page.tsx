@@ -22,7 +22,12 @@ function formatDistance(m: number): string {
 }
 
 export default async function SportPage() {
-  const stats = await getSportStats();
+  let stats = null;
+  try {
+    stats = await getSportStats();
+  } catch (err) {
+    console.error("Sport page error:", err);
+  }
   const recent = stats?.recent ?? [];
   const hrRecords = stats?.hrRecords ?? [];
 

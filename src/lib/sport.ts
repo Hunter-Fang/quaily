@@ -25,22 +25,42 @@ export interface SportRecord {
   totalDistanceM?: number;
 }
 
-async function querySportDB(body: Record<string, unknown> = {}) {
-  const res = await fetch(
-    `https://api.notion.com/v1/databases/${SPORT_DATABASE_ID}/query`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${SPORT_TOKEN}`,
-        "Notion-Version": "2022-06-28",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-      next: { revalidate: 30, tags: ["sport-posts"] },
+async function querySportDB(body: Record<string, unknown> = {}): Promise<NotionQueryResponse> {
+  const token = process.env.SPORT_NOTION_TOKEN || process.env.NOTION_TOKEN;
+  if (!token) throw new Error("Missing NOTION_TOKEN for sport database");
+
+  const tryFetch = async (reqBody: Record<string, unknown>) => {
+    const res = await fetch(
+      `https://api.notion.com/v1/databases/${SPORT_DATABASE_ID}/query`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Notion-Version": "2022-06-28",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(reqBody),
+        next: { revalidate: 30, tags: ["sport-posts"] },
+      }
+    );
+    if (!res.ok) {
+      const errText = await res.text().catch(() => "");
+      console.error(`Sport API ${res.status}:`, errText);
+      return null;
     }
-  );
-  if (!res.ok) throw new Error(`Sport API error: ${res.status}`);
-  return res.json() as Promise<NotionQueryResponse>;
+    return res.json() as Promise<NotionQueryResponse>;
+  };
+
+  // Try with sorts first; if 400, retry without sorts
+  const result = await tryFetch(body);
+  if (result) return result;
+
+  const fallback = { ...body };
+  delete fallback.sorts;
+  const fallbackResult = await tryFetch(fallback);
+  if (fallbackResult) return fallbackResult;
+
+  throw new Error("Failed to query sport database after retries");
 }
 
 function extractText(richTextArray: { plain_text: string }[]): string {
