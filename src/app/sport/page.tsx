@@ -122,9 +122,9 @@ export default async function SportPage() {
                 <tr style={{ borderBottom: "2px solid var(--c-brand)" }}>
                   <th className="py-3 px-3 text-left font-serif font-normal" style={{ color: "var(--c-text-3)" }}>类型</th>
                   <th className="py-3 px-3 text-right font-serif font-normal" style={{ color: "var(--c-text-3)" }}>平均心率</th>
-                  <th className="py-3 px-3 text-right font-serif font-normal" style={{ color: var("--c-text-3") }}>最高心率</th>
-                  <th className="py-3 px-3 text-center font-serif font-normal" style={{ color: var("--c-text-3") }}>有氧/无氧</th>
-                  <th className="py-3 px-3 text-right font-serif font-normal" style={{ color: var("--c-text-3") }}>恢复(h)</th>
+                  <th className="py-3 px-3 text-right font-serif font-normal" style={{ color: "var(--c-text-3)" }}>最高心率</th>
+                  <th className="py-3 px-3 text-center font-serif font-normal" style={{ color: "var(--c-text-3)" }}>有氧/无氧</th>
+                  <th className="py-3 px-3 text-right font-serif font-normal" style={{ color: "var(--c-text-3)" }}>恢复(h)</th>
                 </tr>
               </thead>
               <tbody>
