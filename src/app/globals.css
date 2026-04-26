@@ -1,26 +1,467 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* ── kami Surface ── */
+  --color-parchment: #f5f4ed;
+  --color-ivory: #faf9f5;
+  --color-warm-sand: #e8e6dc;
+  --color-dark-surface: #30302e;
+  --color-deep-dark: #141413;
+
+  /* ── kami Brand ── */
+  --color-brand: #1B365D;
+  --color-brand-light: #2D5A8A;
+
+  /* ── kami Text ── */
+  --color-near-black: #141413;
+  --color-dark-warm: #3d3d3a;
+  --color-charcoal: #4d4c48;
+  --color-olive: #5e5d59;
+  --color-stone: #87867f;
+  --color-warm-silver: #b0aea5;
+
+  /* ── kami Border ── */
+  --color-border-cream: #e8e5da;
+  --color-border-warm: #e0ddd2;
+  --color-border-soft: #e5e3d8;
+  --color-ring-warm: #d1cfc5;
+  --color-ring-deep: #c2c0b6;
+
+  /* ── kami Functional ── */
+  --color-error: #b53333;
+  --color-focus: #3898ec;
+
+  /* ── kami Tag solids (ink-blue over parchment) ── */
+  --color-tag-08: #EEF2F7;
+  --color-tag-18: #E4ECF5;
+  --color-tag-30: #D6E1EE;
+
+  /* ── Layout aliases (Tailwind compat) ── */
+  --color-bg: var(--color-parchment);
+  --color-bg-secondary: var(--color-warm-sand);
+  --color-bg-card: var(--color-ivory);
+  --color-primary: var(--color-near-black);
+  --color-secondary: var(--color-olive);
+  --color-accent: var(--color-brand);
+  --color-accent-light: var(--color-brand-light);
+  --color-border: var(--color-border-cream);
+  --color-border-light: var(--color-border-soft);
+
+  /* ── Fonts ── */
+  --font-sans: "Inter", "TsangerJinKai02", -apple-system,
+    BlinkMacSystemFont, "Source Han Sans SC", "Noto Sans CJK SC",
+    "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+  --font-serif: "TsangerJinKai02", "Source Han Serif SC",
+    "Noto Serif CJK SC", "Songti SC", "STSong", Georgia, serif;
+  --font-mono: "JetBrains Mono", "SF Mono", "Fira Code",
+    Consolas, Monaco, "TsangerJinKai02", "Source Han Serif SC",
+    monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ===== Base ===== */
+html,
+body {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-parchment);
+}
+
+::selection {
+  background-color: #D6E1EE;
+  color: var(--color-brand);
+}
+
+/* ===== Markdown / Article content ===== */
+.article-content {
+  color: var(--color-near-black);
+  line-height: 1.55;
+  font-size: 1.0625rem;
+  font-family: var(--font-sans);
+}
+
+.article-content h1 {
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1.2;
+  margin-top: 2.5rem;
+  margin-bottom: 1.25rem;
+  color: var(--color-near-black);
+  border-left: 3px solid var(--color-brand);
+  border-radius: 2px;
+  padding-left: 12px;
+}
+
+.article-content h2 {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.25;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: var(--color-near-black);
+  border-left: 3px solid var(--color-brand);
+  border-radius: 2px;
+  padding-left: 12px;
+}
+
+.article-content h3 {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.3;
+  margin-top: 1.75rem;
+  margin-bottom: 0.875rem;
+  color: var(--color-near-black);
+  border-left: 2.5px solid var(--color-brand);
+  border-radius: 2px;
+  padding-left: 10px;
+}
+
+.article-content h4 {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-weight: 500;
+  line-height: 1.3;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: var(--color-near-black);
+}
+
+.article-content p {
+  margin-bottom: 1.25rem;
+  line-height: 1.55;
+}
+
+.article-content a {
+  color: var(--color-dark-warm);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--color-tag-18);
+  text-decoration-thickness: 1px;
+  transition: all 0.2s ease;
+  overflow-wrap: break-word;
+  word-break: break-all;
+}
+
+.article-content a:hover {
+  color: var(--color-brand);
+  text-decoration-color: var(--color-brand);
+  text-decoration-thickness: 1.5px;
+}
+
+.article-content blockquote {
+  margin: 1.75rem 0;
+  border-left: 2.5px solid var(--color-brand);
+  padding: 0.75rem 0 0.75rem 1.125rem;
+  color: var(--color-olive);
+  line-height: 1.55;
+  background: none;
+}
+
+.article-content blockquote p {
+  margin-bottom: 0;
+}
+
+.article-content blockquote p + p {
+  margin-top: 0.75rem;
+}
+
+.article-content ul {
+  margin-bottom: 1.25rem;
+  padding-left: 1.25rem;
+  list-style: none;
+}
+
+.article-content ul > li {
+  position: relative;
+  padding-left: 0.75rem;
+  line-height: 1.55;
+}
+
+.article-content ul > li::before {
+  content: "–";
+  position: absolute;
+  left: -0.875rem;
+  color: var(--color-brand);
+  font-weight: 400;
+}
+
+.article-content ol {
+  margin-bottom: 1.25rem;
+  padding-left: 1.25rem;
+  list-style: decimal;
+}
+
+.article-content ol > li::marker {
+  color: var(--color-brand);
+}
+
+.article-content li {
+  margin-bottom: 0.5rem;
+  line-height: 1.55;
+}
+
+.article-content code {
+  font-size: 0.875rem;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: var(--color-tag-08);
+  color: var(--color-brand);
+  font-family: var(--font-mono);
+}
+
+.article-content pre {
+  margin: 1.75rem 0;
+  padding: 1.25rem 1.5rem;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  background: var(--color-ivory) !important;
+  color: var(--color-near-black);
+  border: 1px solid var(--color-border-cream);
+}
+
+.article-content pre code {
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font-size: inherit;
+}
+
+.article-content img {
+  margin: 1.75rem 0;
+  border-radius: 10px;
+  max-width: 100%;
+  height: auto;
+  cursor: zoom-in;
+  transition: box-shadow 0.2s ease;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+}
+
+.article-content img:hover {
+  box-shadow: 0 6px 32px rgba(0, 0, 0, 0.06);
+}
+
+.article-content table {
+  width: 100%;
+  margin: 1.75rem 0;
+  font-size: 0.9rem;
+  border-collapse: collapse;
+}
+
+.article-content th {
+  text-align: left;
+  padding: 0.75rem;
+  font-weight: 500;
+  background: var(--color-warm-sand);
+  border-bottom: 1px solid var(--color-border-cream);
+  font-family: var(--font-serif);
+}
+
+.article-content td {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--color-border-soft);
+}
+
+.article-content hr {
+  margin: 2.5rem 0;
+  border: none;
+  height: 0;
+  text-align: center;
+}
+
+.article-content hr::after {
+  content: "– – –";
+  display: inline-block;
+  letter-spacing: 0.75em;
+  color: var(--color-ring-warm);
+  font-size: 0.8rem;
+}
+
+/* ===== Tag badge (kami lightest solid) ===== */
+.tag-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  background: var(--color-tag-08);
+  color: var(--color-brand);
+  border: 1px solid var(--color-tag-18);
+  transition: all 0.2s ease;
+}
+
+.tag-badge:hover {
+  background: var(--color-tag-18);
+  border-color: var(--color-tag-30);
+  transform: translateY(-1px);
+}
+
+/* ===== Category pill (kami standard solid) ===== */
+.category-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  background: var(--color-tag-18);
+  color: var(--color-brand);
+  border: 1px solid var(--color-tag-30);
+  transition: all 0.2s ease;
+}
+
+.category-pill:hover {
+  background: var(--color-tag-30);
+  border-color: var(--color-brand);
+  transform: translateY(-1px);
+}
+
+/* ===== Card (kami ivory + whisper shadow) ===== */
+.post-card {
+  background: var(--color-ivory);
+  border: 1px solid var(--color-border-cream);
+  border-radius: 10px;
+  transition: box-shadow 0.2s ease;
+}
+
+.post-card:hover {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+}
+
+/* ===== Animations ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Stagger children */
+.stagger-children > * {
+  opacity: 0;
+  animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.stagger-children > *:nth-child(1) { animation-delay: 0.04s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.08s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.12s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.16s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.20s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.24s; }
+.stagger-children > *:nth-child(7) { animation-delay: 0.28s; }
+.stagger-children > *:nth-child(8) { animation-delay: 0.32s; }
+.stagger-children > *:nth-child(9) { animation-delay: 0.36s; }
+.stagger-children > *:nth-child(10) { animation-delay: 0.40s; }
+
+/* Fade in (overlays) */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
+/* ===== Section title (kami brand left bar) ===== */
+.section-title {
+  font-family: var(--font-serif);
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--color-near-black);
+  margin: 2rem 0 0.75rem 0;
+  border-left: 3px solid var(--color-brand);
+  border-radius: 2px;
+  padding-left: 12px;
+}
+
+/* ===== Decorative separator ===== */
+.separator-ornament {
+  position: relative;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    var(--color-border-warm) 20%,
+    var(--color-border-warm) 80%,
+    transparent
+  );
+}
+
+.separator-ornament::after {
+  content: "◇";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--color-parchment);
+  padding: 0 0.75rem;
+  color: var(--color-ring-warm);
+  font-size: 0.5rem;
+}
+
+/* ===== Navigation link ===== */
+.nav-link {
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--color-brand);
+  border-radius: 1px;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateX(-50%);
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* ===== Summary card (kami brand left bar) ===== */
+.summary-card {
+  position: relative;
+  background: var(--color-ivory);
+  border: 1px solid var(--color-border-cream);
+  border-left: 3px solid var(--color-brand);
+  border-radius: 0 8px 8px 0;
+}
+
+/* ===== Scrollbar styling ===== */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-ring-warm);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-stone);
 }
