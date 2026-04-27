@@ -22,6 +22,40 @@ function fmtDistance(m: number): string {
   return "—";
 }
 
+/** Format ISO date string to Beijing time "2026年4月27日" */
+function fmtDateCN(iso: string): string {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  // Convert to Beijing time (UTC+8)
+  const bj = new Date(d.getTime() + 8 * 60 * 60 * 1000);
+  const y = bj.getUTCFullYear();
+  const m = bj.getUTCMonth() + 1;
+  const day = bj.getUTCDate();
+  return `${y}年${m}月${day}日`;
+}
+
+/** Format ISO date to short Beijing time "4月27日" */
+function fmtDateShort(iso: string): string {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  const bj = new Date(d.getTime() + 8 * 60 * 60 * 1000);
+  return `${bj.getUTCMonth() + 1}月${bj.getUTCDate()}日`;
+}
+
+/** Get Beijing date key "YYYY-MM-DD" from ISO string */
+function bjDateKey(iso: string): string {
+  const d = new Date(iso);
+  const bj = new Date(d.getTime() + 8 * 60 * 60 * 1000);
+  return `${bj.getUTCFullYear()}-${String(bj.getUTCMonth() + 1).padStart(2, "0")}-${String(bj.getUTCDate()).padStart(2, "0")}`;
+}
+
+/** Get Beijing month key "YYYY-MM" from ISO string */
+function bjMonthKey(iso: string): string {
+  const d = new Date(iso);
+  const bj = new Date(d.getTime() + 8 * 60 * 60 * 1000);
+  return `${bj.getUTCFullYear()}-${String(bj.getUTCMonth() + 1).padStart(2, "0")}`;
+}
+
 export default async function SportPage() {
   let stats = null;
   try {
@@ -46,7 +80,7 @@ export default async function SportPage() {
 
   // Build chart data
   const trendData = months.map(([month, data]) => ({
-    month: month.slice(5),
+    month: month.replace("-", "年") + "月",
     次数: data.count,
     热量: Math.round(data.cal),
     时长: Math.round(data.timeMin),
@@ -64,7 +98,7 @@ export default async function SportPage() {
     .reverse()
     .filter((r) => r.avgHR && r.maxHR)
     .map((r) => ({
-      date: r.date.slice(5),
+      date: fmtDateShort(r.date),
       平均: r.avgHR!,
       最高: r.maxHR!,
       type: r.type,
@@ -73,7 +107,7 @@ export default async function SportPage() {
   // Weekly heatmap: build from recent records
   const weeklyData: Record<string, { count: number; cal: number; min: number }> = {};
   stats.recent.forEach((r) => {
-    const day = r.date.slice(0, 10);
+    const day = bjDateKey(r.date);
     if (!weeklyData[day]) weeklyData[day] = { count: 0, cal: 0, min: 0 };
     weeklyData[day].count++;
     weeklyData[day].cal += r.calories;
@@ -188,7 +222,7 @@ export default async function SportPage() {
               <tbody>
                 {stats.swimRecords.map((r) => (
                   <tr key={r.id} className="border-b transition-colors hover:opacity-80" style={{ borderColor: "var(--c-border)" }}>
-                    <td className="py-2.5 px-2 font-mono text-xs" style={{ color: "var(--c-text-3)" }}>{r.date.slice(5)}</td>
+                    <td className="py-2.5 px-2 font-mono text-xs" style={{ color: "var(--c-text-3)" }}>{fmtDateShort(r.date)}</td>
                     <td className="py-2.5 px-2 text-sm" style={{ color: "var(--c-text)" }}>{r.name.length > 14 ? r.name.slice(0, 12) + "…" : r.name}</td>
                     <td className="py-2.5 px-2 text-right font-mono tabular-nums text-xs" style={{ color: "var(--c-text-2)" }}>{r.duration}</td>
                     <td className="py-2.5 px-2 text-right font-mono tabular-nums" style={{ color: "var(--c-brand)" }}>{fmtDistance(r.distanceM)}</td>
@@ -223,7 +257,7 @@ export default async function SportPage() {
               <tbody>
                 {stats.rowingRecords.map((r) => (
                   <tr key={r.id} className="border-b transition-colors hover:opacity-80" style={{ borderColor: "var(--c-border)" }}>
-                    <td className="py-2.5 px-2 font-mono text-xs" style={{ color: "var(--c-text-3)" }}>{r.date.slice(5)}</td>
+                    <td className="py-2.5 px-2 font-mono text-xs" style={{ color: "var(--c-text-3)" }}>{fmtDateShort(r.date)}</td>
                     <td className="py-2.5 px-2 text-sm" style={{ color: "var(--c-text)" }}>{r.name.length > 14 ? r.name.slice(0, 12) + "…" : r.name}</td>
                     <td className="py-2.5 px-2 text-right font-mono tabular-nums text-xs" style={{ color: "var(--c-text-2)" }}>{r.duration}</td>
                     <td className="py-2.5 px-2 text-right font-mono tabular-nums" style={{ color: "var(--c-brand)" }}>{r.calories} kcal</td>
@@ -258,7 +292,7 @@ export default async function SportPage() {
               <tbody>
                 {stats.hrRecords.map((r) => (
                   <tr key={r.id} className="border-b transition-colors hover:opacity-80" style={{ borderColor: "var(--c-border)" }}>
-                    <td className="py-2.5 px-2 font-mono text-xs" style={{ color: "var(--c-text-3)" }}>{r.date.slice(5)}</td>
+                    <td className="py-2.5 px-2 font-mono text-xs" style={{ color: "var(--c-text-3)" }}>{fmtDateShort(r.date)}</td>
                     <td className="py-2.5 px-2">
                       <span className="mr-1">{ACTIVITY_EMOJI[r.type] || "🎯"}</span>
                       <span className="text-sm" style={{ color: "var(--c-text-2)" }}>{r.type}</span>
@@ -381,7 +415,7 @@ function WeeklyHeatmap({ data }: { data: Record<string, { count: number; cal: nu
   for (let i = 0; i < 28; i++) {
     const d = new Date(startDate);
     d.setDate(d.getDate() + i);
-    const key = d.toISOString().slice(0, 10);
+    const key = bjDateKey(d.toISOString());
     const dayData = data[key];
     cells.push({
       date: key,
@@ -437,7 +471,7 @@ function ActivityRow({ record }: { record: any }) {
         <div className="flex items-center gap-2 text-xs" style={{ color: "var(--c-text-4)" }}>
           <span>{record.type}</span>
           <span>·</span>
-          <span className="font-mono">{record.date.slice(5)}</span>
+          <span className="font-mono">{fmtDateShort(record.date)}</span>
           <span>·</span>
           <span>{DEVICE_LABELS[record.device] || record.device}</span>
           {record.status && (

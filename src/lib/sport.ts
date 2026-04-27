@@ -2,6 +2,14 @@
 
 const SPORT_DATABASE_ID = "bd890c54c1314740851444e50004e5f5";
 
+/** Get Beijing month key "YYYY-MM" from ISO date string */
+function bjMonthKey(iso: string): string {
+  if (!iso) return "unknown";
+  const d = new Date(iso);
+  const bj = new Date(d.getTime() + 8 * 60 * 60 * 1000);
+  return `${bj.getUTCFullYear()}-${String(bj.getUTCMonth() + 1).padStart(2, "0")}`;
+}
+
 export interface SportRecord {
   id: string;
   name: string;
@@ -185,7 +193,7 @@ export async function getSportStats() {
     byType[r.type].cal += r.calories || 0;
     byType[r.type].distM += r.distanceM || 0;
 
-    const month = r.date.substring(0, 7);
+    const month = bjMonthKey(r.date);
     if (!byMonth[month]) byMonth[month] = { count: 0, cal: 0, timeMin: 0 };
     byMonth[month].count++;
     byMonth[month].cal += r.calories || 0;
