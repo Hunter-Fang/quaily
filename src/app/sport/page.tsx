@@ -1,5 +1,5 @@
 import { getSportStats, ACTIVITY_EMOJI, DEVICE_LABELS, STATUS_COLOR } from "@/lib/sport";
-import Link from "next/link";
+import SportCharts from "./SportCharts";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -43,9 +43,55 @@ export default async function SportPage() {
 
   const sortedTypes = Object.entries(stats.byType).sort((a, b) => b[1].timeMin - a[1].timeMin);
   const months = Object.entries(stats.byMonth).sort(([a], [b]) => a.localeCompare(b)).slice(-6);
-  const maxMonthCal = Math.max(...months.map(([, v]) => v.cal), 1);
-  const maxMonthCount = Math.max(...months.map(([, v]) => v.count), 1);
-  const maxTypeCal = Math.max(...sortedTypes.map(([, v]) => v.cal), 1);
+
+  // Build chart data
+  const trendData = months.map(([month, data]) => ({
+    month: month.slice(5),
+    次数: data.count,
+    热量: Math.round(data.cal),
+    时长: Math.round(data.timeMin),
+  }));
+
+  const typePieData = sortedTypes.map(([type, data]) => ({
+    name: type,
+    value: Math.round(data.cal),
+    count: data.count,
+    emoji: ACTIVITY_EMOJI[type] || "🎯",
+  }));
+
+  const hrData = stats.hrRecords
+    .slice()
+    .reverse()
+    .filter((r) => r.avgHR && r.maxHR)
+    .map((r) => ({
+      date: r.date.slice(5),
+      平均: r.avgHR!,
+      最高: r.maxHR!,
+      type: r.type,
+    }));
+
+  // Weekly heatmap: build from recent records
+  const weeklyData: Record<string, { count: number; cal: number; min: number }> = {};
+  stats.recent.forEach((r) => {
+    const day = r.date.slice(0, 10);
+    if (!weeklyData[day]) weeklyData[day] = { count: 0, cal: 0, min: 0 };
+    weeklyData[day].count++;
+    weeklyData[day].cal += r.calories;
+    const parts = r.duration.split(":").map(Number);
+    const m = parts.length === 3 ? (parts[0] || 0) * 60 + (parts[1] || 0) : parseFloat(r.duration) || 0;
+    weeklyData[day].min += m;
+  });
+
+  // Serialize stats for client component
+  const chartProps = {
+    trendData,
+    typePieData,
+    hrData,
+    totalCount: stats.totalCount,
+    totalTimeMinutes: stats.totalTimeMinutes,
+    totalCalories: Math.round(stats.totalCalories),
+    totalDistanceM: stats.totalDistanceM,
+  };
 
   return (
     <div className="animate-fade-in-up">
@@ -56,13 +102,26 @@ export default async function SportPage() {
         <p className="mt-2 text-sm" style={{ color: "var(--c-text-3)" }}>记录每一次心跳与呼吸</p>
       </div>
 
-      {/* ── Key Metrics ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
-        <MetricCard icon="🏃" label="总训练" value={`${stats.totalCount}`} sub="次" />
-        <MetricCard icon="⏱" label="总时长" value={fmtDuration(stats.totalTimeMinutes)} sub={null} />
-        <MetricCard icon="🔥" label="消耗热量" value={`${Math.round(stats.totalCalories)}`} sub="kcal" />
-        <MetricCard icon="📍" label="总距离" value={fmtDistance(stats.totalDistanceM)} sub={null} />
+      {/* ── Key Metrics + Activity Rings ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+        <div className="lg:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <MetricCard icon="🏃" label="总训练" value={`${stats.totalCount}`} sub="次" />
+          <MetricCard icon="⏱" label="总时长" value={fmtDuration(stats.totalTimeMinutes)} sub={null} />
+          <MetricCard icon="🔥" label="消耗热量" value={`${Math.round(stats.totalCalories)}`} sub="kcal" />
+          <MetricCard icon="📍" label="总距离" value={fmtDistance(stats.totalDistanceM)} sub={null} />
+        </div>
+        {/* Activity Rings - Apple Watch Style */}
+        <div className="flex items-center justify-center">
+          <ActivityRings
+            moveCal={Math.round(stats.totalCalories)}
+            exerciseMin={stats.totalTimeMinutes}
+            workouts={stats.totalCount}
+          />
+        </div>
       </div>
+
+      {/* ── Charts ── */}
+      <SportCharts {...chartProps} />
 
       {/* ── Personal Bests ── */}
       <section className="mb-14">
@@ -92,6 +151,12 @@ export default async function SportPage() {
         </div>
       </section>
 
+      {/* ── Weekly Heatmap ── */}
+      <section className="mb-14">
+        <h3 className="section-title">活动日历</h3>
+        <WeeklyHeatmap data={weeklyData} />
+      </section>
+
       {/* ── Recent Activity ── */}
       <section className="mb-14">
         <h3 className="section-title">最近活动</h3>
@@ -99,76 +164,6 @@ export default async function SportPage() {
           {stats.recent.map((r) => (
             <ActivityRow key={r.id} record={r} />
           ))}
-        </div>
-      </section>
-
-      {/* ── Activity Type Distribution ── */}
-      <section className="mb-14">
-        <h3 className="section-title">运动类型分布</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-          {sortedTypes.map(([type, data]) => (
-            <div key={type} className="metric-card hover:shadow-md transition-shadow cursor-default">
-              <div className="text-xl mb-2">{ACTIVITY_EMOJI[type] || "🎯"}</div>
-              <div className="text-sm font-medium mb-1 truncate" style={{ color: "var(--c-text)" }}>{type}</div>
-              <div className="text-xs" style={{ color: "var(--c-text-4)" }}>
-                {data.count} 次 · {fmtDuration(data.timeMin)} · {Math.round(data.cal)} kcal
-              </div>
-              {data.distM > 0 && (
-                <div className="text-xs mt-1" style={{ color: "var(--c-text-4)" }}>
-                  📍 {fmtDistance(data.distM)}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-        {/* Bar chart */}
-        <div className="p-5 rounded-lg border" style={{ background: "var(--c-surface)", borderColor: "var(--c-border)" }}>
-          <p className="text-xs mb-4 font-medium tracking-wide uppercase" style={{ color: "var(--c-text-4)" }}>各类型消耗热量占比</p>
-          <div className="space-y-3">
-            {sortedTypes.map(([type, data]) => {
-              const pct = Math.max(2, (data.cal / maxTypeCal) * 100);
-              return (
-                <div key={type} className="flex items-center gap-3">
-                  <span className="w-16 text-xs truncate" style={{ color: "var(--c-text-3)" }}>{ACTIVITY_EMOJI[type] || "🎯"}{type}</span>
-                  <div className="flex-1 h-7 rounded relative overflow-hidden" style={{ background: "var(--c-warm-sand)" }}>
-                    <div className="h-full absolute left-0 top-0 rounded flex items-center px-2 text-[10px] font-medium transition-all" style={{ width: `${Math.min(100, pct)}%`, background: "var(--c-brand)", opacity: 0.75, color: "var(--c-surface)" }}>
-                      {pct > 20 ? `${Math.round(data.cal)} kcal` : ""}
-                    </div>
-                  </div>
-                  <span className="w-14 text-right text-xs font-mono tabular-nums" style={{ color: "var(--c-text-3)" }}>{Math.round(data.cal)}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Monthly Trend ── */}
-      <section className="mb-14">
-        <h3 className="section-title">月度趋势（近6月）</h3>
-        <div className="p-5 rounded-lg border" style={{ background: "var(--c-surface)", borderColor: "var(--c-border)" }}>
-          <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${Math.min(months.length, 6)}, 1fr)` }}>
-            {months.map(([month, data]) => {
-              const calPct = Math.max(8, (data.cal / maxMonthCal) * 100);
-              const countPct = Math.max(8, (data.count / maxMonthCount) * 100);
-              return (
-                <div key={month} className="text-center">
-                  <div className="text-[11px] mb-1" style={{ color: "var(--c-text-4)" }}>{month.slice(5)}</div>
-                  <div className="flex justify-center items-end gap-1 h-24 mb-2">
-                    <div className="w-5 rounded-t transition-all" style={{ height: `${countPct}%`, background: "var(--c-brand)", opacity: 0.6 }} title={`${data.count} 次`} />
-                    <div className="w-5 rounded-t transition-all" style={{ height: `${calPct}%`, background: "var(--c-brand)", opacity: 0.3 }} title={`${Math.round(data.cal)} kcal`} />
-                  </div>
-                  <div className="font-serif text-base font-[500]" style={{ color: "var(--c-brand)" }}>{data.count}</div>
-                  <div className="text-[10px]" style={{ color: "var(--c-text-4)" }}>次</div>
-                  <div className="text-[10px] mt-1" style={{ color: "var(--c-text-4)" }}>{Math.round(data.cal)} kcal</div>
-                </div>
-              );
-            })}
-          </div>
-          <div className="flex items-center justify-center gap-4 mt-4 text-[10px]" style={{ color: "var(--c-text-4)" }}>
-            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm inline-block" style={{ background: "var(--c-brand)", opacity: 0.6 }} /> 次数</span>
-            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm inline-block" style={{ background: "var(--c-brand)", opacity: 0.3 }} /> 热量</span>
-          </div>
         </div>
       </section>
 
@@ -223,7 +218,6 @@ export default async function SportPage() {
                   <th className="py-3 px-2 text-right font-serif font-normal" style={{ color: "var(--c-text-3)" }}>热量</th>
                   <th className="py-3 px-2 text-right font-serif font-normal" style={{ color: "var(--c-text-3)" }}>总桨次</th>
                   <th className="py-3 px-2 text-right font-serif font-normal" style={{ color: "var(--c-text-3)" }}>平均桨频</th>
-                  <th className="py-3 px-2 text-right font-serif font-normal" style={{ color: "var(--c-text-3)" }}>最高桨频</th>
                 </tr>
               </thead>
               <tbody>
@@ -235,7 +229,6 @@ export default async function SportPage() {
                     <td className="py-2.5 px-2 text-right font-mono tabular-nums" style={{ color: "var(--c-brand)" }}>{r.calories} kcal</td>
                     <td className="py-2.5 px-2 text-right font-mono tabular-nums" style={{ color: "var(--c-text-2)" }}>{r.totalStrokesRowing ?? "—"}</td>
                     <td className="py-2.5 px-2 text-right font-mono tabular-nums" style={{ color: "var(--c-text-2)" }}>{r.avgStrokeRate ?? "—"}</td>
-                    <td className="py-2.5 px-2 text-right font-mono tabular-nums" style={{ color: "var(--c-text-2)" }}>{r.maxStrokeRate ?? "—"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -244,10 +237,10 @@ export default async function SportPage() {
         </section>
       )}
 
-      {/* ── HR Data ── */}
+      {/* ── HR Data Table ── */}
       {stats.hasHRData && stats.hrRecords.length > 0 && (
         <section className="mb-14">
-          <h3 className="section-title">❤️ 心率数据</h3>
+          <h3 className="section-title">❤️ 心率详情</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -315,6 +308,120 @@ function BestCard({ emoji, title, name, value, detail }: { emoji: string; title:
       <div className="font-serif text-lg font-[500] mb-1" style={{ color: "var(--c-brand)" }}>{value}</div>
       <div className="text-xs truncate" style={{ color: "var(--c-text-3)" }}>{name}</div>
       <div className="text-[10px] mt-1" style={{ color: "var(--c-text-4)" }}>{ACTIVITY_EMOJI[detail] || ""} {detail}</div>
+    </div>
+  );
+}
+
+function ActivityRings({ moveCal, exerciseMin, workouts }: { moveCal: number; exerciseMin: number; workouts: number }) {
+  const moveGoal = 2000;
+  const exerciseGoal = 300;
+  const workoutGoal = 15;
+
+  const rings = [
+    { pct: Math.min(moveCal / moveGoal, 1), color: "#ef4444", bg: "rgba(239,68,68,0.15)", label: "消耗", value: `${moveCal}`, unit: "kcal" },
+    { pct: Math.min(exerciseMin / exerciseGoal, 1), color: "#22c55e", bg: "rgba(34,197,94,0.15)", label: "时长", value: `${Math.round(exerciseMin)}`, unit: "min" },
+    { pct: Math.min(workouts / workoutGoal, 1), color: "#3b82f6", bg: "rgba(59,130,246,0.15)", label: "训练", value: `${workouts}`, unit: "次" },
+  ];
+
+  const size = 180;
+  const cx = size / 2;
+  const cy = size / 2;
+  const strokeWidth = 12;
+  const gap = 6;
+
+  return (
+    <div className="flex flex-col items-center">
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="drop-shadow-sm">
+        {rings.map((ring, i) => {
+          const r = (cx - strokeWidth / 2) - i * (strokeWidth + gap);
+          const circumference = 2 * Math.PI * r;
+          const offset = circumference * (1 - ring.pct);
+          return (
+            <g key={i}>
+              <circle cx={cx} cy={cy} r={r} fill="none" stroke={ring.bg} strokeWidth={strokeWidth} strokeLinecap="round" />
+              <circle
+                cx={cx} cy={cy} r={r} fill="none"
+                stroke={ring.color} strokeWidth={strokeWidth} strokeLinecap="round"
+                strokeDasharray={circumference} strokeDashoffset={offset}
+                transform={`rotate(-90 ${cx} ${cy})`}
+                className="transition-all duration-1000 ease-out"
+              />
+            </g>
+          );
+        })}
+      </svg>
+      <div className="flex gap-4 mt-3">
+        {rings.map((ring, i) => (
+          <div key={i} className="text-center">
+            <div className="flex items-center gap-1 justify-center">
+              <span className="w-2 h-2 rounded-full" style={{ background: ring.color }} />
+              <span className="text-[10px]" style={{ color: "var(--c-text-4)" }}>{ring.label}</span>
+            </div>
+            <div className="font-mono text-xs font-medium" style={{ color: "var(--c-text-2)" }}>{ring.value}{ring.unit}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function WeeklyHeatmap({ data }: { data: Record<string, { count: number; cal: number; min: number }> }) {
+  const days = Object.keys(data).sort();
+  if (days.length === 0) return null;
+
+  const maxCal = Math.max(...Object.values(data).map((d) => d.cal), 1);
+
+  // Build a 7-day week grid
+  const weekDays = ["一", "二", "三", "四", "五", "六", "日"];
+  const today = new Date();
+  const startDate = new Date(today);
+  startDate.setDate(startDate.getDate() - 27); // Last 4 weeks
+
+  const cells: { date: string; day: string; intensity: number; cal: number }[] = [];
+  for (let i = 0; i < 28; i++) {
+    const d = new Date(startDate);
+    d.setDate(d.getDate() + i);
+    const key = d.toISOString().slice(0, 10);
+    const dayData = data[key];
+    cells.push({
+      date: key,
+      day: weekDays[(d.getDay() + 6) % 7],
+      intensity: dayData ? Math.max(0.15, dayData.cal / maxCal) : 0,
+      cal: dayData?.cal || 0,
+    });
+  }
+
+  return (
+    <div className="p-5 rounded-lg border" style={{ background: "var(--c-surface)", borderColor: "var(--c-border)" }}>
+      <div className="flex gap-1 justify-center">
+        {weekDays.map((wd) => (
+          <div key={wd} className="grid gap-1" style={{ width: 28 }}>
+            <div className="text-[9px] text-center mb-1" style={{ color: "var(--c-text-4)" }}>{wd}</div>
+            {cells.filter((c) => c.day === wd).map((c) => (
+              <div
+                key={c.date}
+                className="rounded-sm mx-auto"
+                style={{
+                  width: 22,
+                  height: 22,
+                  background: c.intensity > 0
+                    ? `rgba(27,54,93,${c.intensity})`
+                    : "var(--c-warm-sand)",
+                }}
+                title={`${c.date}: ${c.cal > 0 ? `${c.cal} kcal` : "无活动"}`}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+      <div className="flex items-center justify-center gap-2 mt-4 text-[10px]" style={{ color: "var(--c-text-4)" }}>
+        <span>少</span>
+        <span className="w-3 h-3 rounded-sm" style={{ background: "var(--c-warm-sand)" }} />
+        <span className="w-3 h-3 rounded-sm" style={{ background: "rgba(27,54,93,0.2)" }} />
+        <span className="w-3 h-3 rounded-sm" style={{ background: "rgba(27,54,93,0.5)" }} />
+        <span className="w-3 h-3 rounded-sm" style={{ background: "rgba(27,54,93,0.8)" }} />
+        <span>多</span>
+      </div>
     </div>
   );
 }
