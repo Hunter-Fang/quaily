@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getAllTags, getPostsByTag } from "@/lib/notion";
 
-export const revalidate = 10;
+export const revalidate = 1800;
 export const metadata = {
   title: "标签",
   description: "按标签浏览椒盐不谈博客的所有文章",

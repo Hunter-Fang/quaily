@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import url("https://fonts.googleapis.com/css2?family=Newsreader:wght@400;500&family=Inter:wght@400;500;600&display=swap");
 
 @theme {
   /* ── Carmen / Kami Surface ── */
@@ -33,10 +32,10 @@
   --color-tag-18:      #E4ECF5;
   --color-tag-30:      #D0DCE9;
 
-  /* ── Fonts ── */
-  --font-serif: "Newsreader", "TsangerJinKai02", "Source Han Serif SC",
+  /* ── Fonts（通过 next/font 自托管，无需访问 Google CDN） ── */
+  --font-serif: var(--font-newsreader), "TsangerJinKai02", "Source Han Serif SC",
                 "Noto Serif CJK SC", "Songti SC", Georgia, serif;
-  --font-sans:  "Inter", -apple-system, BlinkMacSystemFont,
+  --font-sans:  var(--font-inter), -apple-system, BlinkMacSystemFont,
                 "Source Han Sans SC", "Noto Sans CJK SC",
                 "PingFang SC", sans-serif;
   --font-mono:  "JetBrains Mono", "SF Mono", "Fira Code",

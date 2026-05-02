@@ -3,7 +3,7 @@ import { getPostsByCategory, getAllCategories } from "@/lib/notion";
 import PostCard from "@/components/PostCard";
 import type { Metadata } from "next";
 
-export const revalidate = 10;
+export const revalidate = 1800;
 type PageProps = { params: Promise<{ category: string }> };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

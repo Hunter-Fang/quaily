@@ -3,7 +3,7 @@ import PostCard from "@/components/PostCard";
 import FeaturedPost from "@/components/FeaturedPost";
 import Pagination from "@/components/Pagination";
 
-export const revalidate = 10;
+export const revalidate = 1800;
 
 const POSTS_PER_PAGE = 10;
 

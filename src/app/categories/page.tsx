@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getAllCategories, getPostsByCategory } from "@/lib/notion";
 
-export const revalidate = 10;
+export const revalidate = 1800;
 export const metadata = {
   title: "分类",
   description: "按分类浏览椒盐不谈博客的所有文章",

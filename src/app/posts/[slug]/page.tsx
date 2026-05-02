@@ -6,7 +6,7 @@ import BackButton from "@/components/BackButton";
 import TableOfContents from "@/components/TableOfContents";
 import type { Metadata } from "next";
 
-export const revalidate = 10;
+export const revalidate = 1800;
 type PageProps = { params: Promise<{ slug: string }> };
 const BASE_URL = "https://blog.focword.cn";
 
