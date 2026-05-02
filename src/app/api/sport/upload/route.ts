@@ -21,7 +21,7 @@ export interface SportEntry {
   有氧训练效果?: number;         // 0-5
   无氧训练效果?: number;         // 0-5
   "恢复时间(小时)"?: number;
-  平均配速?: string;             // 如 "3'19\" / 100m"
+  "平均配速(/100m)"?: string;     // 只填数值，如 "3'19"
   心率区间分布?: string;         // JSON 字符串
   备注?: string;
 
@@ -54,7 +54,7 @@ function buildNotionPage(e: SportEntry) {
   // rich_text
   const rt = (v: string) => ({ rich_text: [{ text: { content: v } }] });
   if (e.总时长)      p["总时长"]      = rt(e.总时长);
-  if (e.平均配速)    p["平均配速"]    = rt(e.平均配速);
+  if (e["平均配速(/100m)"]) p["平均配速"]    = rt(e["平均配速(/100m)"]);
   if (e.心率区间分布) p["心率区间分布"] = rt(e.心率区间分布);
   if (e.备注)        p["备注"]        = rt(e.备注);
 

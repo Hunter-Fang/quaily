@@ -228,7 +228,7 @@ export default async function SportPage() {
                     <td className="py-2.5 px-2 text-right font-mono tabular-nums" style={{ color: "var(--c-brand)" }}>{fmtDistance(r.distanceM)}</td>
                     <td className="py-2.5 px-2 text-right font-mono tabular-nums" style={{ color: "var(--c-text-2)" }}>{r.laps ?? "—"}</td>
                     <td className="py-2.5 px-2 text-right font-mono tabular-nums" style={{ color: "var(--c-text-2)" }}>{r.swolf ?? "—"}</td>
-                    <td className="py-2.5 px-2 text-right text-xs" style={{ color: "var(--c-text-3)" }}>{r.avgPace || "—"}</td>
+                    <td className="py-2.5 px-2 text-right text-xs" style={{ color: "var(--c-text-3)" }}>{r.avgPace ? `${r.avgPace} /100m` : "—"}</td>
                     <td className="py-2.5 px-2 text-right font-mono tabular-nums text-xs" style={{ color: "var(--c-text-3)" }}>{r.totalStrokes ?? "—"}<span className="opacity-50">/ {r.strokeRate ?? "—"}spm</span></td>
                   </tr>
                 ))}
