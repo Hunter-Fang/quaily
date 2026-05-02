@@ -452,7 +452,7 @@ export default function SportUploadPage() {
                   ["有氧训练效果", "number", "0-5，如 2.6"],
                   ["无氧训练效果", "number", "0-5，如 0.4"],
                   ["恢复时间", "number", "小时"],
-                  ["平均配速", "string", "如"3'02\\" / 100m""],
+                  ["平均配速", "string", "如: 3'02\" / 100m"],
                   ["备注", "string", "自由文本"],
                   ["总趟数", "number", "游泳专项"],
                   ["平均SWOLF", "number", "游泳专项"],
