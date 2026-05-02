@@ -21,25 +21,41 @@ export default async function CategoriesPage() {
   return (
     <div className="animate-fade-in-up">
       <div className="kami-section-header">
-        <div className="eyebrow"><span />Categories</div>
+        <div className="eyebrow">Categories</div>
         <h1>分类</h1>
-        <p className="mt-2 text-sm" style={{ color: "var(--c-text-3)" }}>按分类浏览文章</p>
+        <p className="mt-3" style={{ fontSize: "0.875rem", color: "var(--c-text-3)" }}>
+          按分类浏览文章
+        </p>
         <div className="rule" />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {catsWithCount.map(({ name, count }) => (
-          <Link key={name} href={`/categories/${name}`}>
-            <div className="metric-card group cursor-pointer hover:shadow-md transition-shadow">
-              <div className="metric-value">{count}</div>
-              <div className="metric-label mt-1">{name}</div>
-            </div>
-          </Link>
-        ))}
-      </div>
-
-      {categories.length === 0 && (
+      {categories.length === 0 ? (
         <p className="text-center py-24" style={{ color: "var(--c-text-3)" }}>暂无分类</p>
+      ) : (
+        <div className="stagger-children grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {catsWithCount.map(({ name, count }) => (
+            <Link key={name} href={`/categories/${name}`} className="block">
+              <div className="metric-card cursor-pointer text-left" style={{ textAlign: "left" }}>
+                <div
+                  className="font-serif mb-1"
+                  style={{ fontWeight: 500, fontSize: "2rem", lineHeight: 1.1, color: "var(--c-brand)", fontVariantNumeric: "tabular-nums" }}
+                >
+                  {count}
+                </div>
+                <div
+                  style={{ fontFamily: "var(--font-sans)", fontSize: "0.8rem", fontWeight: 500, color: "var(--c-text-2)" }}
+                >
+                  {name}
+                </div>
+                <div
+                  style={{ fontFamily: "var(--font-sans)", fontSize: "0.68rem", fontWeight: 600, color: "var(--c-text-4)", letterSpacing: "0.4px", textTransform: "uppercase", marginTop: "4px" }}
+                >
+                  篇文章
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
       )}
     </div>
   );

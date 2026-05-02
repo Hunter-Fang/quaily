@@ -1,22 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Inter } from "next/font/google";
 import ScrollToTop from "@/components/ScrollToTop";
 import ReadingProgress from "@/components/ReadingProgress";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
 import ImageLightbox from "@/components/ImageLightbox";
 import MobileNav from "@/components/MobileNav";
-import SiteCounter from "@/components/SiteCounter";
 import ThemeToggle from "@/components/ThemeToggle";
 import "./globals.css";
-
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  display: "swap",
-  variable: "--font-sans",
-  preload: true,
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://blog.focword.cn"),
@@ -51,10 +41,19 @@ export const metadata: Metadata = {
   },
 };
 
+const NAV_LINKS = [
+  { href: "/", label: "首页" },
+  { href: "/categories", label: "分类" },
+  { href: "/tags", label: "标签" },
+  { href: "/posts/about", label: "关于" },
+  { href: "/sport", label: "运动" },
+];
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="zh-CN" className={inter.variable} suppressHydrationWarning>
+    <html lang="zh-CN" suppressHydrationWarning>
       <head>
+        {/* 防主题闪烁 */}
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})()`,
@@ -66,26 +65,31 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <ImageLightbox />
         <ScrollToTopButton />
 
-        {/* ── Navigation ── */}
+        {/* ── Header ── */}
         <header
           className="sticky top-0 z-50 backdrop-blur-xl border-b"
-          style={{
-            backgroundColor: "var(--c-header-bg)",
-            borderColor: "var(--c-border)",
-          }}
+          style={{ backgroundColor: "var(--c-header-bg)", borderColor: "var(--c-border)" }}
         >
           <nav className="max-w-4xl mx-auto px-6 h-14 flex items-center justify-between">
-            <Link href="/" className="font-serif font-[500] text-lg tracking-wide hover:opacity-70 transition-opacity" style={{ color: "var(--c-text)" }}>
+            {/* Logo */}
+            <Link
+              href="/"
+              className="font-serif transition-opacity hover:opacity-70"
+              style={{ fontWeight: 500, fontSize: "1.1rem", color: "var(--c-text)", letterSpacing: "0.01em" }}
+            >
               椒盐不谈
             </Link>
-            <div className="flex items-center gap-5">
+
+            {/* Desktop nav */}
+            <div className="flex items-center gap-4">
               <div className="hidden sm:flex items-center gap-6">
-                <Link href="/" className="nav-link text-sm font-medium" style={{ color: "var(--c-text-3)" }}>首页</Link>
-                <Link href="/categories" className="nav-link text-sm font-medium" style={{ color: "var(--c-text-3)" }}>分类</Link>
-                <Link href="/tags" className="nav-link text-sm font-medium" style={{ color: "var(--c-text-3)" }}>标签</Link>
-                <Link href="/posts/about" className="nav-link text-sm font-medium" style={{ color: "var(--c-text-3)" }}>关于</Link>
-                <Link href="/sport" className="nav-link text-sm font-medium" style={{ color: "var(--c-text-3)" }}>运动</Link>
+                {NAV_LINKS.map(({ href, label }) => (
+                  <Link key={href} href={href} className="nav-link">
+                    {label}
+                  </Link>
+                ))}
               </div>
+              <div className="w-px h-4 hidden sm:block" style={{ background: "var(--c-border)" }} />
               <ThemeToggle />
               <MobileNav />
             </div>
@@ -98,25 +102,48 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           {children}
         </main>
 
-        {/* ── Footer ── */}
-        <footer className="border-t" style={{ background: "var(--c-footer-bg)", borderColor: "var(--c-border)" }}>
+        {/* ── Footer — deep-dark ── */}
+        <footer className="site-footer">
           <div className="max-w-4xl mx-auto px-6 py-12">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-              <div className="text-center sm:text-left">
-                <p className="font-serif font-[500] tracking-wide mb-1" style={{ color: "var(--c-text)" }}>椒盐不谈</p>
-                <p className="text-xs" style={{ color: "var(--c-text-4)" }}>想法、阅读与生活的记录</p>
+            {/* Top row */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
+              <div>
+                <p
+                  className="font-serif mb-1"
+                  style={{ fontWeight: 500, fontSize: "1rem", color: "var(--color-ivory)" }}
+                >
+                  椒盐不谈
+                </p>
+                <p style={{ fontSize: "0.75rem", color: "var(--color-stone)", lineHeight: 1.5 }}>
+                  想法、阅读与生活的记录
+                </p>
               </div>
-              <div className="flex items-center gap-5">
-                <Link href="/categories" className="text-sm transition-colors hover:opacity-70" style={{ color: "var(--c-text-3)" }}>分类</Link>
-                <Link href="/tags" className="text-sm transition-colors hover:opacity-70" style={{ color: "var(--c-text-3)" }}>标签</Link>
-                <Link href="/posts/about" className="text-sm transition-colors hover:opacity-70" style={{ color: "var(--c-text-3)" }}>关于</Link>
-                <Link href="/feed.xml" className="text-sm transition-colors hover:opacity-70" style={{ color: "var(--c-text-3)" }} title="RSS">RSS</Link>
-              </div>
+              <nav className="flex items-center gap-5 flex-wrap">
+                {NAV_LINKS.map(({ href, label }) => (
+                  <Link key={href} href={href} style={{ fontSize: "0.8125rem", color: "var(--color-warm-silver)" }} className="transition-colors hover:text-white">
+                    {label}
+                  </Link>
+                ))}
+                <Link
+                  href="/feed.xml"
+                  style={{ fontSize: "0.8125rem", color: "var(--color-warm-silver)" }}
+                  className="transition-colors hover:text-white"
+                  title="RSS Feed"
+                >
+                  RSS
+                </Link>
+              </nav>
             </div>
-            <div className="separator-ornament my-6" />
-            <SiteCounter />
-            <p className="text-center text-xs mt-6" style={{ color: "var(--c-text-4)" }}>
-              © {new Date().getFullYear()} 椒盐不谈 · Powered by <a href="https://notion.so" target="_blank" rel="noopener noreferrer" className="hover:opacity-70">Notion</a> & <a href="https://nextjs.org" target="_blank" rel="noopener noreferrer" className="hover:opacity-70">Next.js</a>
+
+            {/* Divider */}
+            <div className="mt-8 mb-6" style={{ height: "1px", background: "rgba(255,255,255,0.08)" }} />
+
+            {/* Copyright */}
+            <p style={{ fontSize: "0.72rem", color: "var(--color-stone)", textAlign: "center" }}>
+              © {new Date().getFullYear()} 椒盐不谈 · Powered by{" "}
+              <a href="https://notion.so" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Notion</a>
+              {" "}& {" "}
+              <a href="https://nextjs.org" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Next.js</a>
             </p>
           </div>
         </footer>
