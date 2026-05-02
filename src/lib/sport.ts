@@ -17,25 +17,13 @@ export interface SportRecord {
   date: string;
   duration: string;
   calories: number;
-  device: string;
   distanceM: number;
-  // Swim specific
-  laps?: number;
-  swolf?: number;
-  avgPace?: string;
-  totalStrokes?: number;
-  strokeRate?: number;
-  // Rowing specific
-  totalStrokesRowing?: number;
-  avgStrokeRate?: number;
-  maxStrokeRate?: number;
-  // HR & training effect
   avgHR?: number;
   maxHR?: number;
   aerobicEffect?: number;
   anaerobicEffect?: number;
   recoveryHours?: number;
-  // Status
+  avgPace?: string;   // 平均配速每100m
   status?: string;
   note?: string;
 }
@@ -115,24 +103,13 @@ function extractSportRecord(page: NotionPage): SportRecord {
     date: getDate("日期时间"),
     duration: getRichText("总时长"),
     calories: getNumber("消耗热量(kcal)") || 0,
-    device: getSelect("设备来源") || "手动录入",
     distanceM: getNumber("总距离(m)") || 0,
-    // Swim
-    laps: getNumber("总趟数"),
-    swolf: getNumber("平均SWOLF"),
-    avgPace: getRichText("平均配速"),
-    totalStrokes: getNumber("总划水次数"),
-    strokeRate: getNumber("平均划水率(SPM)"),
-    // Rowing
-    totalStrokesRowing: getNumber("总桨次"),
-    avgStrokeRate: getNumber("平均桨频"),
-    maxStrokeRate: getNumber("最高桨频"),
-    // HR & training
     avgHR: getNumber("平均心率(bpm)"),
     maxHR: getNumber("最高心率(bpm)"),
     aerobicEffect: getNumber("有氧训练效果"),
     anaerobicEffect: getNumber("无氧训练效果"),
     recoveryHours: getNumber("恢复时间(小时)"),
+    avgPace: getRichText("平均配速每100m"),
     status: getSelect("运动状态"),
     note: getRichText("备注"),
   };
@@ -225,8 +202,6 @@ export async function getSportStats() {
     longestWorkout,
     highestCal,
     longestDist,
-    swimRecords: records.filter((r) => r.type === "游泳"),
-    rowingRecords: records.filter((r) => r.type === "划船机"),
   };
 }
 

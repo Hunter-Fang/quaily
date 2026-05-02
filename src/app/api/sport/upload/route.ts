@@ -4,13 +4,11 @@ const NOTION_TOKEN = process.env.SPORT_NOTION_TOKEN || process.env.NOTION_TOKEN;
 const DATABASE_ID = "bd890c54c1314740851444e50004e5f5";
 
 export interface SportEntry {
-  // 必填
   活动名称: string;
   日期时间: string;
   运动类型: string;
   总时长: string;
   "消耗热量(kcal)": number;
-  // 选填
   运动状态?: string;
   "总距离(m)"?: number;
   "平均心率(bpm)"?: number;
@@ -18,33 +16,31 @@ export interface SportEntry {
   有氧训练效果?: number;
   无氧训练效果?: number;
   "恢复时间(小时)"?: number;
-  平均配速?: string;
-  心率区间分布?: string;
+  平均配速每100m?: string;
   备注?: string;
 }
 
 function buildNotionPage(e: SportEntry) {
   const p: Record<string, unknown> = {};
+  const rt = (v: string) => ({ rich_text: [{ text: { content: v } }] });
 
   p["活动名称"] = { title: [{ text: { content: e.活动名称 } }] };
   p["日期时间"]  = { date: { start: e.日期时间 } };
   p["运动类型"]  = { select: { name: e.运动类型 } };
+  p["总时长"]    = rt(e.总时长);
 
-  const rt = (v: string) => ({ rich_text: [{ text: { content: v } }] });
-  p["总时长"] = rt(e.总时长);
-  if (e.运动状态)    p["运动状态"]    = { select: { name: e.运动状态 } };
-  if (e.平均配速)    p["平均配速"]    = rt(e.平均配速);
-  if (e.心率区间分布) p["心率区间分布"] = rt(e.心率区间分布);
-  if (e.备注)        p["备注"]        = rt(e.备注);
+  if (e.运动状态)       p["运动状态"]       = { select: { name: e.运动状态 } };
+  if (e.平均配速每100m) p["平均配速每100m"] = rt(e.平均配速每100m);
+  if (e.备注)           p["备注"]           = rt(e.备注);
 
   const nums: [string, unknown][] = [
-    ["消耗热量(kcal)",  e["消耗热量(kcal)"]],
-    ["总距离(m)",       e["总距离(m)"]],
-    ["平均心率(bpm)",   e["平均心率(bpm)"]],
-    ["最高心率(bpm)",   e["最高心率(bpm)"]],
-    ["有氧训练效果",    e.有氧训练效果],
-    ["无氧训练效果",    e.无氧训练效果],
-    ["恢复时间(小时)",  e["恢复时间(小时)"]],
+    ["消耗热量(kcal)", e["消耗热量(kcal)"]],
+    ["总距离(m)",      e["总距离(m)"]],
+    ["平均心率(bpm)",  e["平均心率(bpm)"]],
+    ["最高心率(bpm)",  e["最高心率(bpm)"]],
+    ["有氧训练效果",   e.有氧训练效果],
+    ["无氧训练效果",   e.无氧训练效果],
+    ["恢复时间(小时)", e["恢复时间(小时)"]],
   ];
   for (const [key, val] of nums) {
     if (val !== undefined && val !== null) p[key] = { number: Number(val) };
@@ -67,9 +63,9 @@ export async function POST(req: NextRequest) {
 
   for (let i = 0; i < entries.length; i++) {
     const e = entries[i];
-    const missing = ["活动名称","日期时间","运动类型","总时长","消耗热量(kcal)"].filter(
-      k => e[k as keyof SportEntry] === undefined || e[k as keyof SportEntry] === null || e[k as keyof SportEntry] === ""
-    );
+    const missing = (["活动名称","日期时间","运动类型","总时长","消耗热量(kcal)"] as (keyof SportEntry)[])
+      .filter(k => e[k] === undefined || e[k] === null || e[k] === "");
+
     if (missing.length) {
       results.push({ index: i, name: e.活动名称 || `#${i}`, status: "error", error: `缺少：${missing.join("、")}` });
       continue;
