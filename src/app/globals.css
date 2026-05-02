@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+/* ── 仓耳今楷02 W04 — 自托管 woff2 ── */
+@font-face {
+  font-family: "TsangerJinKai02";
+  src: url("/fonts/TsangerJinKai02-W04.woff2") format("woff2");
+  font-weight: 400 500;
+  font-style: normal;
+  font-display: swap;
+}
+
 
 @theme {
   /* ── Carmen / Kami Surface ── */
@@ -34,11 +43,11 @@
   --color-tag-30:      #D0DCE9;
 
   /* ── Fonts ── */
-  /* 衬线：英文 Charter（系统内置）+ 中文 Noto Serif SC（npm 自托管） */
+  /* 衬线：英文 Charter（系统内置）+ 中文仓耳今楷02（自托管 woff2） */
   --font-serif: "Charter", "Bitstream Charter",
-                "Noto Serif SC", "Source Han Serif SC",
-                "Songti SC", Georgia, serif;
-  /* 无衬线：Inter（next/font 自托管）+ 系统中文 */
+                "TsangerJinKai02", "Noto Serif SC",
+                "Source Han Serif SC", "Songti SC", Georgia, serif;
+  /* 无衬线：Inter（自托管）+ 系统中文 */
   --font-sans:  var(--font-inter), -apple-system, BlinkMacSystemFont,
                 "PingFang SC", "Source Han Sans SC",
                 "Noto Sans CJK SC", sans-serif;
