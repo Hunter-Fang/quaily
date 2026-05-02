@@ -41,13 +41,13 @@
   --color-tag-08:      #EEF2F7;
   --color-tag-18:      #E4ECF5;
   --color-tag-30:      #D0DCE9;
+}
 
-  /* ── Fonts ── */
-  /* 衬线：英文 Charter（系统内置）+ 中文仓耳今楷02（自托管 woff2） */
+/* ── 字体变量放 :root，让所有 CSS 都能 var() 引用 ── */
+:root {
   --font-serif: "Charter", "Bitstream Charter",
                 "TsangerJinKai02", "Noto Serif SC",
                 "Source Han Serif SC", "Songti SC", Georgia, serif;
-  /* 无衬线：Inter（自托管）+ 系统中文 */
   --font-sans:  var(--font-inter), -apple-system, BlinkMacSystemFont,
                 "PingFang SC", "Source Han Sans SC",
                 "Noto Sans CJK SC", sans-serif;
