@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+/* ── TsangerJinKai02 中文衬线字体 ── */
+@font-face {
+  font-family: "TsangerJinKai02";
+  src: url("https://cdn.jsdelivr.net/gh/nreaGithub/TsangerJinKai02@main/TsangerJinKai02-W03.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "TsangerJinKai02";
+  src: url("https://cdn.jsdelivr.net/gh/nreaGithub/TsangerJinKai02@main/TsangerJinKai02-W04.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
   /* ── Carmen / Kami Surface ── */
   --color-parchment:   #f5f4ed;
@@ -32,12 +48,15 @@
   --color-tag-18:      #E4ECF5;
   --color-tag-30:      #D0DCE9;
 
-  /* ── Fonts（通过 next/font 自托管，无需访问 Google CDN） ── */
-  --font-serif: var(--font-newsreader), "TsangerJinKai02", "Source Han Serif SC",
-                "Noto Serif CJK SC", "Songti SC", Georgia, serif;
+  /* ── Fonts ── */
+  /* 衬线：英文用 Charter（系统内置，macOS/iOS/Windows），中文用仓耳金楷 */
+  --font-serif: "Charter", "Bitstream Charter", "TsangerJinKai02",
+                "Source Han Serif SC", "Noto Serif CJK SC",
+                "Songti SC", Georgia, serif;
+  /* 无衬线：UI 标签 / 元信息用 Inter，中文用系统无衬线 */
   --font-sans:  var(--font-inter), -apple-system, BlinkMacSystemFont,
-                "Source Han Sans SC", "Noto Sans CJK SC",
-                "PingFang SC", sans-serif;
+                "TsangerJinKai02", "PingFang SC",
+                "Source Han Sans SC", "Noto Sans CJK SC", sans-serif;
   --font-mono:  "JetBrains Mono", "SF Mono", "Fira Code",
                 Consolas, Monaco, monospace;
 }

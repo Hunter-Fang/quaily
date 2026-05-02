@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Inter, Newsreader } from "next/font/google";
+import { Inter } from "next/font/google";
 import ScrollToTop from "@/components/ScrollToTop";
 import ReadingProgress from "@/components/ReadingProgress";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
@@ -14,14 +14,6 @@ const inter = Inter({
   weight: ["400", "500", "600"],
   display: "swap",
   variable: "--font-inter",
-  preload: true,
-});
-
-const newsreader = Newsreader({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  display: "swap",
-  variable: "--font-newsreader",
   preload: true,
 });
 
@@ -68,7 +60,7 @@ const NAV_LINKS = [
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="zh-CN" className={`${inter.variable} ${newsreader.variable}`} suppressHydrationWarning>
+    <html lang="zh-CN" className={inter.variable} suppressHydrationWarning>
       <head>
         {/* 防主题闪烁 */}
         <script
