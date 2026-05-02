@@ -121,7 +121,7 @@ html {
 body {
   background: var(--c-bg);
   color: var(--c-text);
-  font-family: var(--font-sans);
+  font-family: var(--font-serif);
   font-size: 15px;
   line-height: 1.55;
   transition: background 0.3s ease, color 0.3s ease;
