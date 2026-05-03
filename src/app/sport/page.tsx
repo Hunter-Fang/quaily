@@ -160,16 +160,16 @@ export default async function SportPage() {
                     </td>
                     <td className="py-2.5 px-2 text-right font-mono font-medium" style={{ color: "var(--c-brand)" }}>{r.avgHR ?? "—"}</td>
                     <td className="py-2.5 px-2 text-right font-mono font-medium" style={{ color: "var(--c-text-2)" }}>{r.maxHR ?? "—"}</td>
-                    <td className="py-2.5 px-2 text-center">
-                      {r.aerobicEffect != null && <span className="inline-block px-2 py-0.5 rounded text-xs font-medium" style={{ background: "var(--c-tag-bg)", color: "var(--c-brand)" }}>{r.aerobicEffect.toFixed(1)}</span>}
+                    <td className="py-2.5 px-2 text-center font-mono text-xs" style={{ color: "var(--c-brand)" }}>
+                      {r.aerobicEffect != null ? r.aerobicEffect.toFixed(1) : "—"}
                     </td>
-                    <td className="py-2.5 px-2 text-center">
-                      {r.anaerobicEffect != null && <span className="inline-block px-2 py-0.5 rounded text-xs font-medium" style={{ background: "var(--c-tag-bg)", color: "var(--c-tag-border)" }}>{r.anaerobicEffect.toFixed(1)}</span>}
+                    <td className="py-2.5 px-2 text-center font-mono text-xs" style={{ color: "var(--c-text-3)" }}>
+                      {r.anaerobicEffect != null ? r.anaerobicEffect.toFixed(1) : "—"}
                     </td>
                     <td className="py-2.5 px-2 text-right font-mono text-xs" style={{ color: "var(--c-text-2)" }}>{r.recoveryHours != null ? `${r.recoveryHours}h` : "—"}</td>
                     <td className="py-2.5 px-2 text-right text-xs" style={{ color: "var(--c-text-3)" }}>{r.avgPace || "—"}</td>
-                    <td className="py-2.5 px-2 text-center">
-                      {r.status && <span className="inline-block w-2 h-2 rounded-full" style={{ background: STATUS_COLOR[r.status] || "var(--c-text-4)" }} title={r.status} />}
+                    <td className="py-2.5 px-2 text-center text-xs" style={{ color: STATUS_COLOR[r.status] || "var(--c-text-4)" }}>
+                      {r.status || "—"}
                     </td>
                   </tr>
                 ))}
