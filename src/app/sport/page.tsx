@@ -168,7 +168,7 @@ export default async function SportPage() {
                     </td>
                     <td className="py-2.5 px-2 text-right font-mono text-xs" style={{ color: "var(--c-text-2)" }}>{r.recoveryHours != null ? `${r.recoveryHours}h` : "—"}</td>
                     <td className="py-2.5 px-2 text-right text-xs" style={{ color: "var(--c-text-3)" }}>{r.avgPace || "—"}</td>
-                    <td className="py-2.5 px-2 text-center text-xs" style={{ color: STATUS_COLOR[r.status] || "var(--c-text-4)" }}>
+                    <td className="py-2.5 px-2 text-center text-xs" style={{ color: r.status ? (STATUS_COLOR[r.status] ?? "var(--c-text-4)") : "var(--c-text-4)" }}>
                       {r.status || "—"}
                     </td>
                   </tr>
