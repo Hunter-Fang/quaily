@@ -17,7 +17,6 @@ export interface SportEntry {
   无氧训练效果?: number;
   "恢复时间(小时)"?: number;
   平均配速每100m?: string;
-  备注?: string;
 }
 
 function buildNotionPage(e: SportEntry) {
@@ -31,7 +30,6 @@ function buildNotionPage(e: SportEntry) {
 
   if (e.运动状态)       p["运动状态"]       = { select: { name: e.运动状态 } };
   if (e.平均配速每100m) p["平均配速每100m"] = rt(e.平均配速每100m);
-  if (e.备注)           p["备注"]           = rt(e.备注);
 
   const nums: [string, unknown][] = [
     ["消耗热量(kcal)", e["消耗热量(kcal)"]],

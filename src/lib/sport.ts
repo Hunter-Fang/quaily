@@ -25,7 +25,6 @@ export interface SportRecord {
   recoveryHours?: number;
   avgPace?: string;   // 平均配速每100m
   status?: string;
-  note?: string;
 }
 
 interface NotionPage {
@@ -111,7 +110,6 @@ function extractSportRecord(page: NotionPage): SportRecord {
     recoveryHours: getNumber("恢复时间(小时)"),
     avgPace: getRichText("平均配速每100m"),
     status: getSelect("运动状态"),
-    note: getRichText("备注"),
   };
 }
 
