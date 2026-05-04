@@ -1,15 +1,30 @@
 "use client";
 
 import ReactMarkdown from "react-markdown";
+import Image from "next/image";
 
 export default function MarkdownRenderer({ content }: { content: string }) {
   return (
     <div className="article-content">
       <ReactMarkdown
         components={{
-          img: ({ src, alt, ...props }) => (
-            <img src={src} alt={alt || ""} loading="lazy" className="my-6 rounded-xl max-w-full h-auto" {...props} />
-          ),
+          img: ({ src, alt, ...props }: any) => {
+            if (!src || typeof src !== "string") return null;
+            // fill mode: strip width/height (they conflict with next/image fill)
+            const { width, height, ...safeProps } = props;
+            return (
+              <div className="relative w-full" style={{ minHeight: 200 }}>
+                <Image
+                  src={src}
+                  alt={alt || ""}
+                  fill
+                  className="my-6 rounded-xl object-contain"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 800px, 1200px"
+                  {...safeProps}
+                />
+              </div>
+            );
+          },
           a: ({ href, children, ...props }) => (
             <a href={href} target={href?.startsWith("http") ? "_blank" : undefined} rel={href?.startsWith("http") ? "noopener noreferrer" : undefined} {...props}>
               {children}

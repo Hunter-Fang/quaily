@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 import { getPostBySlug, getPublishedPosts, getAdjacentPosts } from "@/lib/notion";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
@@ -135,7 +136,14 @@ export default async function PostPage({ params }: PageProps) {
         {/* ── Cover ── */}
         {post.cover && (
           <div className="mb-10 -mx-6 sm:mx-0">
-            <img src={post.cover} alt={post.title} className="w-full rounded-xl" style={{ boxShadow: "0 4px 24px var(--c-shadow)" }} />
+            <div className="relative w-full overflow-hidden rounded-xl" style={{ minHeight: 200, boxShadow: "0 4px 24px var(--c-shadow)" }}>
+              <Image
+                src={post.cover}
+                alt={post.title}
+                fill
+                className="rounded-xl object-cover"
+              />
+            </div>
           </div>
         )}
 

@@ -16,6 +16,8 @@ const nextConfig: NextConfig = {
         hostname: "images.unsplash.com",
       },
     ],
+    // Cache images for 24h on Vercel edge (S3 URLs expire in 1h, this bridges the gap)
+    minimumCacheTTL: 60 * 60 * 24,
   },
 };
 
