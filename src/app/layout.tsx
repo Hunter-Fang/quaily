@@ -34,21 +34,38 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "椒盐不谈 | 关于想法、阅读与生活的个人博客",
-    description: "一个关于想法、阅读与生活的个人博客",
+    description: "一个关于想法、阅读与生活的个人博客，分享原创思考与感悟。",
     url: "https://blog.focword.cn",
     siteName: "椒盐不谈",
     locale: "zh_CN",
     type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "椒盐不谈",
+      },
+    ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "椒盐不谈",
-    description: "一个关于想法、阅读与生活的个人博客",
+    description: "一个关于想法、阅读与生活的个人博客，分享原创思考与感悟。",
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
     follow: true,
     googleBot: { index: true, follow: true, "max-video-preview": -1, "max-image-preview": "large", "max-snippet": -1 },
+  },
+  authors: [{ name: "Hunter Fang" }],
+  creator: "Hunter Fang",
+  publisher: "椒盐不谈",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
   },
 };
 
