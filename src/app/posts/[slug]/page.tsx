@@ -140,14 +140,12 @@ export default async function PostPage({ params }: PageProps) {
         )}
 
         {/* ── Content + TOC ── */}
-        <div className="flex gap-10">
-          {/* Sidebar TOC (desktop) */}
-          <aside className="hidden lg:block w-48 flex-shrink-0">
-            <TableOfContents />
-          </aside>
+        {/* 无目录时 lg 断点以上正文居中，有目录时 TOC 组件内部渲染侧边栏 */}
+        <div className="flex flex-col lg:flex-row gap-10">
+          <TableOfContents />
 
           {/* Article body */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 lg:max-w-4xl">{/* lg 以上有 TOC 时限制宽度，无 TOC 时 mx-auto 居中 */}</commit task}>
             <MarkdownRenderer content={post.markdown} />
 
             {/* Tags */}

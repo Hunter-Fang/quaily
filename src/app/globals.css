@@ -255,6 +255,13 @@ body::before {
   font-weight: 400;
 }
 
+/* ── TOC 锚点滚动偏移（防止固定导航栏遮挡标题） ── */
+.article-content h1,
+.article-content h2,
+.article-content h3 {
+  scroll-margin-top: 80px;
+}
+
 .article-content ol {
   margin-bottom: 1.4rem;
   padding-left: 1.5rem;

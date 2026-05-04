@@ -52,29 +52,32 @@ export default function TableOfContents() {
     return () => observer.disconnect();
   }, [headings]);
 
+  // 少于 2 个标题不显示目录
   if (headings.length < 2) return null;
 
   return (
-    <nav className="toc-sidebar" aria-label="目录">
-      <p className="text-xs font-medium tracking-[0.15em] uppercase mb-4" style={{ color: "var(--c-text-4)" }}>
-        目录
-      </p>
-      <div className="flex flex-col gap-1">
-        {headings.map((h) => (
-          <a
-            key={h.id}
-            href={`#${h.id}`}
-            className={activeId === h.id ? "active" : ""}
-            style={{ paddingLeft: h.level > 2 ? "24px" : "12px" }}
-            onClick={(e) => {
-              e.preventDefault();
-              document.getElementById(h.id)?.scrollIntoView({ behavior: "smooth" });
-            }}
-          >
-            {h.text}
-          </a>
-        ))}
-      </div>
-    </nav>
+    <aside className="hidden lg:block w-48 flex-shrink-0">
+      <nav className="toc-sidebar" aria-label="目录">
+        <p className="text-xs font-medium tracking-[0.15em] uppercase mb-4" style={{ color: "var(--c-text-4)" }}>
+          目录
+        </p>
+        <div className="flex flex-col gap-1">
+          {headings.map((h) => (
+            <a
+              key={h.id}
+              href={`#${h.id}`}
+              className={activeId === h.id ? "active" : ""}
+              style={{ paddingLeft: h.level > 2 ? "24px" : "12px" }}
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById(h.id)?.scrollIntoView({ behavior: "smooth" });
+              }}
+            >
+              {h.text}
+            </a>
+          ))}
+        </div>
+      </nav>
+    </aside>
   );
 }
