@@ -145,7 +145,7 @@ export default async function PostPage({ params }: PageProps) {
           <TableOfContents />
 
           {/* Article body */}
-          <div className="flex-1 min-w-0 lg:max-w-4xl">{/* lg 以上有 TOC 时限制宽度，无 TOC 时 mx-auto 居中 */}</commit task}>
+          <div className="flex-1 min-w-0 lg:max-w-4xl">
             <MarkdownRenderer content={post.markdown} />
 
             {/* Tags */}
