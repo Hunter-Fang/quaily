@@ -121,8 +121,9 @@ function extractSportRecord(page: NotionPage): SportRecord {
   };
 }
 
-/** Get all sport records sorted by date descending */
-export async function getSportRecords(): Promise<SportRecord[]> {
+/** Get sport records sorted by date descending.
+ *  @param limit 0 = fetch all (for stats); 20 = initial page load */
+export async function getSportRecords(limit = 0): Promise<SportRecord[]> {
   let allRecords: SportRecord[] = [];
   let hasMore = true;
   let cursor: string | undefined;
@@ -135,18 +136,26 @@ export async function getSportRecords(): Promise<SportRecord[]> {
     const records = response.results.map((r) => extractSportRecord(r));
     allRecords = allRecords.concat(records);
 
+    // If we only need `limit` records and already have enough, stop
+    if (limit > 0 && allRecords.length >= limit) break;
+
     hasMore = response.has_more;
     cursor = response.next_cursor;
   }
 
   // Sort by date descending
   allRecords.sort((a, b) => b.date.localeCompare(a.date));
+  if (limit > 0) allRecords = allRecords.slice(0, limit);
   return allRecords;
 }
 
-/** Aggregate statistics */
-export async function getSportStats() {
-  const records = await getSportRecords();
+/** Aggregate statistics.
+ * 首屏只传入最近 20 条，其余数据异步加载 */
+export async function getSportStats(initialRecords?: SportRecord[]) {
+  const records = initialRecords && initialRecords.length > 0
+    ? initialRecords
+    : await getSportRecords(20);
+
   if (records.length === 0) return null;
 
   let totalTimeMinutes = 0;
