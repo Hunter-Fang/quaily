@@ -14,30 +14,37 @@ const NOTION_TOKEN = process.env.NOTION_TOKEN!;
 const DATABASE_ID = process.env.NOTION_DATABASE_ID!;
 
 // Revalidation interval in seconds — Notion changes will be reflected within this period
-const REVALIDATE_SECONDS = 10;
+const REVALIDATE_SECONDS = 3600;  // ISR 缓存 1 小时
 
 // Use direct fetch for database queries to avoid SDK issues
 async function queryDatabase(body: Record<string, unknown> = {}): Promise<NotionQueryResponse> {
-  const res = await fetch(
-    `https://api.notion.com/v1/databases/${DATABASE_ID}/query`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${NOTION_TOKEN}`,
-        "Notion-Version": "2022-06-28",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-      next: { revalidate: REVALIDATE_SECONDS, tags: ["notion-posts"] },
+  try {
+    const res = await fetch(
+      `https://api.notion.com/v1/databases/${DATABASE_ID}/query`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${NOTION_TOKEN}`,
+          "Notion-Version": "2022-06-28",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+        next: { revalidate: REVALIDATE_SECONDS, tags: ["notion-posts"] },
+      }
+    );
+
+    if (!res.ok) {
+      const err = await res.text().catch(() => "");
+      console.warn(`Notion API warn: ${res.status} ${err.slice(0, 200)}`);
+      // 构建时返回空数据，ISr 运行时会在 Vercel 服务器上重新获取
+      return { results: [], has_more: false, next_cursor: null };
     }
-  );
 
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Notion API error: ${res.status} ${err}`);
+    return res.json();
+  } catch (err) {
+    console.warn("Notion fetch failed (build?):", err);
+    return { results: [], has_more: false, next_cursor: null };
   }
-
-  return res.json();
 }
 
 // ---------- Types ----------
@@ -236,26 +243,29 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
   return { ...meta, markdown };
 }
 
-// Fetch all blocks for a page
 async function getPageBlocks(pageId: string): Promise<NotionBlock[]> {
   const blocks: NotionBlock[] = [];
   let cursor: string | undefined;
 
   do {
     const url = `https://api.notion.com/v1/blocks/${pageId}/children?page_size=100${cursor ? `&start_cursor=${cursor}` : ""}`;
-    const res = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${NOTION_TOKEN}`,
-        "Notion-Version": "2022-06-28",
-      },
-      next: { revalidate: REVALIDATE_SECONDS, tags: ["notion-posts"] },
-    });
+    try {
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${NOTION_TOKEN}`,
+          "Notion-Version": "2022-06-28",
+        },
+        next: { revalidate: REVALIDATE_SECONDS, tags: ["notion-posts"] },
+      });
 
-    if (!res.ok) break;
+      if (!res.ok) break;
 
-    const data = await res.json();
-    blocks.push(...data.results);
-    cursor = data.has_more ? data.next_cursor : undefined;
+      const data = await res.json() as { results: NotionBlock[]; has_more: boolean; next_cursor: string | null };
+      blocks.push(...data.results);
+      cursor = data.has_more ? data.next_cursor ?? undefined : undefined;
+    } catch {
+      break;
+    }
   } while (cursor);
 
   return blocks;

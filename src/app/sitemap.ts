@@ -3,7 +3,10 @@ import { getPublishedPosts, getAllCategories, getAllTags } from "@/lib/notion";
 
 const BASE_URL = "https://blog.focword.cn";
 
+export const revalidate = 3600;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  // 这些函数在 Notion 不可达时返回空数组，不会 throw
   const posts = await getPublishedPosts();
   const categories = await getAllCategories();
   const tags = await getAllTags();

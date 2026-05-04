@@ -1,8 +1,7 @@
 import { getSportStats, ACTIVITY_EMOJI, STATUS_COLOR } from "@/lib/sport";
 import SportCharts from "./SportCharts";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 3600; // ISR 缓存 1 小时
 
 export const metadata = {
   title: "运动数据 | 椒盐不谈",
